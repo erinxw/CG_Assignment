@@ -36,9 +36,9 @@ public class Boat extends JFrame implements GLEventListener {
         gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
         try {
-            woodBodyTexture = TextureIO.newTexture(new File("C:\\Users\\User\\Documents\\NetBeansProjects\\CGAssignment\\CGAssignment\\texture\\wood_body.jpg"), true);
-            clothSailsTexture = TextureIO.newTexture(new File("C:\\Users\\User\\Documents\\NetBeansProjects\\CGAssignment\\CGAssignment\\texture\\cloth_sails.jpg"), true);
-            woodPoleTexture = TextureIO.newTexture(new File("C:\\Users\\User\\Documents\\NetBeansProjects\\CGAssignment\\CGAssignment\\texture\\wood_pole.jpg"), true);
+            woodBodyTexture = TextureIO.newTexture(new File("C:\\Users\\User\\Documents\\NetBeansProjects\\CGAssignment\\CGAssignment\\src\\texture\\wood_body.jpg"), true);
+            clothSailsTexture = TextureIO.newTexture(new File("C:\\Users\\User\\Documents\\NetBeansProjects\\CGAssignment\\CGAssignment\\src\\texture\\cloth_sails.jpg"), true);
+            woodPoleTexture = TextureIO.newTexture(new File("C:\\Users\\User\\Documents\\NetBeansProjects\\CGAssignment\\CGAssignment\\src\\texture\\wood_pole.jpg"), true);
 
             // Set texture parameters for cloth texture
             clothSailsTexture.bind(gl);
