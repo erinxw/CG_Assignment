@@ -18,18 +18,25 @@ import com.jogamp.opengl.awt.GLJPanel;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.texture.Texture;
-//import com.jogamp.opengl.util.texture.TextureIO;
-//import java.io.File;
-//import java.io.IOException;
+import com.jogamp.opengl.util.texture.TextureIO;
+import java.io.File;
+import java.io.IOException;
 
 public class CGAssignment implements GLEventListener{
     
     private double pos = -4;  //The position of one of the suns
     private double theta = 0; //The angle of one of the suns.
     
-    /*private Texture woodBodyTexture;
+    private Texture woodBodyTexture;
     private Texture clothSailsTexture;
-    private Texture woodPoleTexture;*/
+    private Texture woodPoleTexture;
+    
+    private Texture logTexture;
+    private boolean faceNormals = true;
+    private static int angle = 0;
+    private static int slices = 32;
+    
+    private boolean applyTexture = false;
     
     public static void main(String[] args) {
            // Initialise OpenGL
@@ -59,66 +66,117 @@ public class CGAssignment implements GLEventListener{
     private float textureOffset;
     @Override
     public void display(GLAutoDrawable drawable) {
-           GL2 gl = drawable.getGL().getGL2();
-   gl.glClear(GL.GL_COLOR_BUFFER_BIT); // Fills the scene with blue.
+        GL2 gl = drawable.getGL().getGL2();
+        gl.glClear(GL.GL_COLOR_BUFFER_BIT); // Fills the scene with blue.
 
-   gl.glMatrixMode(GL2.GL_MODELVIEW);
-   gl.glLoadIdentity();
+        gl.glMatrixMode(GL2.GL_MODELVIEW);
+        gl.glLoadIdentity();
    
+        applyTexture = false;
    
-   update(); // Update the models
-   draw(gl); // Draw the models
+        update(); // Update the models
+        draw(gl); // Draw the models
    
-   drawGrass(gl);
-   drawRiver(gl); // Draw the river
-   drawHills(gl);
-   drawBoat(gl);
-   drawHouse(gl);
-   drawClouds(gl);
-   drawTree(gl);
+        drawGrass(gl);
+        drawRiver(gl); // Draw the river
+        drawHills(gl);
+        drawHouse(gl);
+        
+/*gl.glPushMatrix();
+gl.glLoadIdentity();
+
+// Set the camera position and orientation
+double cameraDistance = 4.0;
+double cameraHeight = 0.0;
+double cameraAngle = 55.0; // Rotation angle around Y-axis
+
+gl.glTranslated(0, 0, -8);
+gl.glTranslatef(0, 0, (float) -cameraDistance);
+gl.glRotatef((float) cameraAngle, 0, 1, 0);
+gl.glTranslatef(0, (float) -cameraHeight, 0);
+
+drawLogs(drawable, 4, slices, !faceNormals);
+
+gl.glPopMatrix();*/
+
+        drawClouds(gl);
+        drawTree(gl);
+        drawBoat(gl);
+        
    
-   }
+    }
     
        @Override
-   public void dispose(GLAutoDrawable drawable) {
-        //GL2 gl = drawable.getGL().getGL2();
-        //woodBodyTexture.destroy(gl);
-        //clothSailsTexture.destroy(gl);
-       // woodPoleTexture.destroy(gl);
-   }
+    public void dispose(GLAutoDrawable drawable) {
+       //for the boat
+        GL2 gl = drawable.getGL().getGL2();
+        woodBodyTexture.destroy(gl);
+        clothSailsTexture.destroy(gl);
+        woodPoleTexture.destroy(gl);
+        logTexture.destroy(gl);
+    }
    
-   @Override
-   public void init(GLAutoDrawable drawable) {
+    @Override
+    public void init(GLAutoDrawable drawable) {
        
-       
-      GL2 gl = drawable.getGL().getGL2();
+        GL2 gl = drawable.getGL().getGL2();
       gl.glClearColor(0.6f, 0.9f, 1f, 1);
-      
-      /*gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        
+        initTexture(gl);
+    }
 
+    public void initTexture(GL2 gl) {
         try {
             woodBodyTexture = TextureIO.newTexture(new File("C:\\Users\\Asus\\Desktop\\um stuffs\\CLASS\\WIG2002 - Computer Graphics\\CG_Assignment\\CGAssignment\\src\\texture\\wood_body.jpg"), true);
             clothSailsTexture = TextureIO.newTexture(new File("C:\\Users\\Asus\\Desktop\\um stuffs\\CLASS\\WIG2002 - Computer Graphics\\CG_Assignment\\CGAssignment\\src\\texture\\cloth_sails.jpg"), true);
             woodPoleTexture = TextureIO.newTexture(new File("C:\\Users\\Asus\\Desktop\\um stuffs\\CLASS\\WIG2002 - Computer Graphics\\CG_Assignment\\CGAssignment\\src\\texture\\wood_pole.jpg"), true);
+            logTexture = TextureIO.newTexture(new File("C:\\Users\\Asus\\Desktop\\um stuffs\\CLASS\\WIG2002 - Computer Graphics\\CG_Assignment\\CGAssignment\\src\\texture\\log.jpg"), true);
 
             // Set texture parameters for cloth texture
             clothSailsTexture.bind(gl);
             gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
             gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
 
+            // Set texture parameters for wood texture
+            woodBodyTexture.bind(gl);
+            gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
+            gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
+
+           /* // Set texture parameters for log texture
+            logTexture.bind(gl);
+            gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
+            gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
+
+            // enable lighting
+            gl.glEnable(GL2.GL_LIGHTING);
+            // turn on a light. Use default settings.
+            gl.glEnable(GL2.GL_LIGHT0);
+            float r = 0.24f;
+            float g = 0.13f;
+            float b = 0.08f;
+
+            float[] materialAmbient = {r, g, b, 1.0f};
+            float[] materialDiffuse = {r, g, b, 1.0f};
+            float[] materialSpecular = {1.0f, 1.0f, 1.0f, 1.0f};
+            float materialShininess = 32.0f;
+
+            gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_AMBIENT, materialAmbient, 0);
+            gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_DIFFUSE, materialDiffuse, 0);
+            gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_SPECULAR, materialSpecular, 0);
+            gl.glMaterialf(GL2.GL_FRONT, GL2.GL_SHININESS, materialShininess);
+
+            // normalise normals (!)
+            // this is necessary to make lighting work properly
+            gl.glEnable(GL2.GL_NORMALIZE);*/
+
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
-        gl.glEnable(GL.GL_TEXTURE_2D);
-        gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE, GL2.GL_REPLACE);
-        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
-        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
-     */
-   }
    
-   @Override
-   public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
+    @Override
+    public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
 	      GL2 gl = drawable.getGL().getGL2();
 	      // The next three lines set up the coordinates system.
 	      gl.glMatrixMode(GL2.GL_PROJECTION);
@@ -144,9 +202,554 @@ public class CGAssignment implements GLEventListener{
     gl.glVertex3f(-5.0f, -3.0f, 0.0f);
     gl.glEnd();       
    }
-   
+   /*
+   private void drawLogs(GLAutoDrawable drawable, int height, int slices, boolean cylinder) {
+
+       
+        GL2 gl = drawable.getGL().getGL2();
+        gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
+        applyTexture = true;
+            if (applyTexture) {
+            // Enable texture mapping
+                gl.glEnable(GL.GL_TEXTURE_2D);
+                gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE, GL2.GL_REPLACE);
+                gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
+                gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
+
+            }
+        
+        double z1 = 0;
+        double z2 = -height;
+        gl.glPolygonMode(GL.GL_BACK, GL2.GL_FILL);
+
+        //Bind log texture
+        logTexture.bind(gl);
+
+        //Front circle of first cylinder
+        gl.glBegin(GL2.GL_TRIANGLE_FAN);
+        {
+            gl.glNormal3d(0, 0, 1);
+            gl.glVertex3d(0, 0, z1);
+
+            double angleStep = 2 * Math.PI / slices;
+            for (int i = 0; i <= slices; i++) {
+                double a0 = i * angleStep;
+                double x0 = Math.cos(a0);
+                double y0 = Math.sin(a0);
+
+                double u = (x0 + 1) / 2.0; // Calculate texture U coordinate
+                double v = (y0 + 1) / 2.0; // Calculate texture V coordinate
+
+                gl.glTexCoord2d(u, v); // Texture coordinates
+                gl.glVertex3d(x0, y0, z1);
+            }
+        }
+        gl.glEnd();
+
+        //Back circle of first cylinder
+        gl.glBegin(GL2.GL_TRIANGLE_FAN);
+        {
+
+            gl.glNormal3d(0, 0, -1);
+            gl.glVertex3d(0, 0, z2);
+            double angleStep = 2 * Math.PI / slices;
+            for (int i = 0; i <= slices; i++) {
+
+                double a0 = 2 * Math.PI - i * angleStep;
+
+                double x0 = Math.cos(a0);
+                double y0 = Math.sin(a0);
+
+                gl.glVertex3d(x0, y0, z2);
+            }
+
+        }
+        gl.glEnd();
+
+        // Bind the log texture
+        logTexture.bind(gl);
+
+        //Sides of the first cylinder
+        gl.glBegin(GL2.GL_QUADS);
+        {
+            double angleStep = 2 * Math.PI / slices;
+            for (int i = 0; i <= slices; i++) {
+                double a0 = i * angleStep;
+                double a1 = ((i + 1) % slices) * angleStep;
+
+                //Calculate vertices for the quad
+                double x0 = Math.cos(a0);
+                double y0 = Math.sin(a0);
+
+                double x1 = Math.cos(a1);
+                double y1 = Math.sin(a1);
+
+                //Calculate texture coordinates
+                float u0 = (float) i / slices;
+                float v0 = 0.0f;
+                float u1 = (float) (i + 1) / slices;
+                float v1 = 1.0f;
+
+                //Set texture coordinates for the vertices
+                gl.glTexCoord2f(u0, v0);
+                gl.glVertex3d(x0, y0, z1);
+
+                gl.glTexCoord2f(u0, v1);
+                gl.glVertex3d(x0, y0, z2);
+
+                gl.glTexCoord2f(u1, v1);
+                gl.glVertex3d(x1, y1, z2);
+
+                gl.glTexCoord2f(u1, v0);
+                gl.glVertex3d(x1, y1, z1);
+            }
+        }
+        gl.glEnd();
+
+        gl.glPolygonMode(GL.GL_FRONT_AND_BACK, GL2.GL_FILL);
+        
+        // Draw the second cylinder on the side
+        double xShift = 1.5; // Horizontal shift for the second cylinder
+        double yShift = 0.3;   // Vertical shift for the second cylinder
+
+        // Bind the log texture
+        logTexture.bind(gl);
+
+        // Front circle of the second cylinder
+        gl.glBegin(GL2.GL_TRIANGLE_FAN);
+        {
+            gl.glNormal3d(0, 0, 1);
+            gl.glTexCoord2d(0.5, 0.5); // Center texture coordinate
+            gl.glVertex3d(xShift, yShift, z1);
+            double angleStep = 2 * Math.PI / slices;
+            for (int i = 0; i <= slices; i++) {
+                double a0 = i * angleStep;
+                double x0 = Math.cos(a0);
+                double y0 = Math.sin(a0);
+                double u = 0.5 * (x0 + 1); // Normalize x coordinate to range [0, 1]
+                double v = 0.5 * (y0 + 1); // Normalize y coordinate to range [0, 1]
+
+                gl.glTexCoord2d(u, v);
+                gl.glVertex3d(x0 + xShift, y0 + yShift, z1);
+            }
+        }
+        gl.glEnd();
+
+        // Back circle of the second cylinder
+        gl.glBegin(GL2.GL_TRIANGLE_FAN);
+        {
+            gl.glNormal3d(0, 0, -1);
+            gl.glVertex3d(xShift, yShift, z2);
+            double angleStep = 2 * Math.PI / slices;
+            for (int i = 0; i <= slices; i++) {
+                double a0 = 2 * Math.PI - i * angleStep;
+                double x0 = Math.cos(a0);
+                double y0 = Math.sin(a0);
+
+                gl.glVertex3d(x0 + xShift, y0 + yShift, z2);
+            }
+        }
+        gl.glEnd();
+
+        // Bind the log texture
+        logTexture.bind(gl);
+
+        // Sides of the second cylinder
+        gl.glBegin(GL2.GL_QUADS);
+        {
+            double angleStep = 2 * Math.PI / slices;
+            for (int i = 0; i <= slices; i++) {
+                double a0 = i * angleStep;
+                double a1 = ((i + 1) % slices) * angleStep;
+
+                double x0 = Math.cos(a0);
+                double y0 = Math.sin(a0);
+
+                double x1 = Math.cos(a1);
+                double y1 = Math.sin(a1);
+
+                if (cylinder) {
+                    gl.glNormal3d(x0, y0, 0);
+                } else {
+                    gl.glNormal3d(-(z2 - z1) * (y1 - y0), (x1 - x0) * (z2 - z1), 0);
+                }
+
+                gl.glTexCoord2f(0, 0);
+                gl.glVertex3d(x0 + xShift, y0 + yShift, z1);
+
+                gl.glTexCoord2f(0, 1);
+                gl.glVertex3d(x0 + xShift, y0 + yShift, z2);
+
+                if (cylinder) {
+                    gl.glNormal3d(x1, y1, 0);
+                }
+
+                gl.glTexCoord2f(1, 1);
+                gl.glVertex3d(x1 + xShift, y1 + yShift, z2);
+
+                gl.glTexCoord2f(1, 0);
+                gl.glVertex3d(x1 + xShift, y1 + yShift, z1);
+            }
+        }
+        gl.glEnd();
+
+        // Third Cylinder
+        double xShiftThird = -1.5; // Horizontal shift for the third cylinder
+        double yShiftThird = -0.3;  // Vertical shift for the third cylinder
+
+        // Bind the log texture
+        logTexture.bind(gl);
+
+        // Front circle of the third cylinder
+        gl.glBegin(GL2.GL_TRIANGLE_FAN);
+        {
+            gl.glNormal3d(0, 0, 1);
+            gl.glTexCoord2d(0.5, 0.5); // Center texture coordinate
+            gl.glVertex3d(xShiftThird, yShiftThird, z1);
+            double angleStep = 2 * Math.PI / slices;
+            for (int i = 0; i <= slices; i++) {
+                double a0 = i * angleStep;
+                double x0 = Math.cos(a0);
+                double y0 = Math.sin(a0);
+                double u = 0.5 * (x0 + 1); // Normalize x coordinate to range [0, 1]
+                double v = 0.5 * (y0 + 1); // Normalize y coordinate to range [0, 1]
+
+                gl.glTexCoord2d(u, v);
+                gl.glVertex3d(x0 + xShiftThird, y0 + yShiftThird, z1);
+            }
+        }
+        gl.glEnd();
+
+        // Back circle of the third cylinder
+        gl.glBegin(GL2.GL_TRIANGLE_FAN);
+        {
+            gl.glNormal3d(0, 0, -1);
+            gl.glVertex3d(xShiftThird, yShiftThird, z2);
+            double angleStep = 2 * Math.PI / slices;
+            for (int i = 0; i <= slices; i++) {
+                double a0 = 2 * Math.PI - i * angleStep;
+                double x0 = Math.cos(a0);
+                double y0 = Math.sin(a0);
+
+                gl.glVertex3d(x0 + xShiftThird, y0 + yShiftThird, z2);
+            }
+        }
+        gl.glEnd();
+
+        // Bind the log texture
+        logTexture.bind(gl);
+
+        // Sides of the third cylinder
+        gl.glBegin(GL2.GL_QUADS);
+        {
+            double angleStep = 2 * Math.PI / slices;
+            for (int i = 0; i <= slices; i++) {
+                double a0 = i * angleStep;
+                double a1 = ((i + 1) % slices) * angleStep;
+
+                double x0 = Math.cos(a0);
+                double y0 = Math.sin(a0);
+
+                double x1 = Math.cos(a1);
+                double y1 = Math.sin(a1);
+
+                if (cylinder) {
+                    gl.glNormal3d(x0, y0, 0);
+                } else {
+                    gl.glNormal3d(-(z2 - z1) * (y1 - y0), (x1 - x0) * (z2 - z1), 0);
+                }
+
+                gl.glTexCoord2f(0, 0);
+                gl.glVertex3d(x0 + xShiftThird, y0 + yShiftThird, z1);
+
+                gl.glTexCoord2f(0, 1.0f); // Use the full height of the texture vertically
+                gl.glVertex3d(x0 + xShiftThird, y0 + yShiftThird, z2);
+
+                if (cylinder) {
+                    gl.glNormal3d(x1, y1, 0);
+                }
+
+                gl.glTexCoord2f(0.5f, 1.0f); // Use the full width of the texture horizontally
+                gl.glVertex3d(x1 + xShiftThird, y1 + yShiftThird, z2);
+
+                gl.glTexCoord2f(0.5f, 0); // Use the full width of the texture horizontally
+                gl.glVertex3d(x1 + xShiftThird, y1 + yShiftThird, z1);
+            }
+        }
+        gl.glEnd();
+
+        // Fourth Cylinder
+        double xShiftFourth = 0.6; // Horizontal shift for the fourth cylinder
+        double yShiftFourth = 1.3;  // Vertical shift for the fourth cylinder
+
+        // Bind the log texture
+        logTexture.bind(gl);
+
+        // Front circle of the fourth cylinder
+        gl.glBegin(GL2.GL_TRIANGLE_FAN);
+        {
+            gl.glNormal3d(0, 0, 1);
+            gl.glTexCoord2d(0.5, 0.5); // Center texture coordinate
+            gl.glVertex3d(xShiftFourth, yShiftFourth, z1);
+            gl.glColor3f(0.1f, 0.1f, 0.1f); // Set shadow color
+            gl.glTexCoord2d(0.5, 0.5); // Center texture coordinate for the shadow vertex
+            gl.glVertex3d(xShiftThird, yShiftThird, z1);
+            double angleStep = 2 * Math.PI / slices;
+            for (int i = 0; i <= slices; i++) {
+                double a0 = i * angleStep;
+                double x0 = Math.cos(a0);
+                double y0 = Math.sin(a0);
+                double u = 0.5 * (x0 + 1); // Normalize x coordinate to range [0, 1]
+                double v = 0.5 * (y0 + 1); // Normalize y coordinate to range [0, 1]
+
+                gl.glTexCoord2d(u, v);
+                gl.glVertex3d(x0 + xShiftFourth, y0 + yShiftFourth, z1);
+            }
+        }
+        gl.glEnd();
+
+        // Back circle of the fourth cylinder
+        gl.glBegin(GL2.GL_TRIANGLE_FAN);
+        {
+            gl.glNormal3d(0, 0, -1);
+            gl.glVertex3d(xShiftFourth, yShiftFourth, z2);
+            double angleStep = 2 * Math.PI / slices;
+            for (int i = 0; i <= slices; i++) {
+                double a0 = 2 * Math.PI - i * angleStep;
+                double x0 = Math.cos(a0);
+                double y0 = Math.sin(a0);
+
+                gl.glVertex3d(x0 + xShiftFourth, y0 + yShiftFourth, z2);
+            }
+        }
+        gl.glEnd();
+
+        // Sides of the fourth cylinder
+        gl.glBegin(GL2.GL_QUADS);
+        {
+            double angleStep = 2 * Math.PI / slices;
+            for (int i = 0; i <= slices; i++) {
+                double a0 = i * angleStep;
+                double a1 = ((i + 1) % slices) * angleStep;
+
+                double x0 = Math.cos(a0);
+                double y0 = Math.sin(a0);
+
+                double x1 = Math.cos(a1);
+                double y1 = Math.sin(a1);
+
+                if (cylinder) {
+                    gl.glNormal3d(x0, y0, 0);
+                } else {
+                    gl.glNormal3d(-(z2 - z1) * (y1 - y0), (x1 - x0) * (z2 - z1), 0);
+                }
+
+                gl.glTexCoord2f(0, 0);
+                gl.glVertex3d(x0 + xShiftFourth, y0 + yShiftFourth, z1);
+
+                gl.glTexCoord2f(0, 1.0f);
+                gl.glVertex3d(x0 + xShiftFourth, y0 + yShiftFourth, z2);
+
+                if (cylinder) {
+                    gl.glNormal3d(x1, y1, 0);
+                }
+
+                gl.glTexCoord2f(0.5f, 1.0f);
+                gl.glVertex3d(x1 + xShiftFourth, y1 + yShiftFourth, z2);
+
+                gl.glTexCoord2f(0.5f, 0);
+                gl.glVertex3d(x1 + xShiftFourth, y1 + yShiftFourth, z1);
+            }
+        }
+        gl.glEnd();
+
+        // Fifth Cylinder
+        double xShiftFifth = -1; // Horizontal shift for the fifth cylinder
+        double yShiftFifth = 1;  // Vertical shift for the fifth cylinder
+
+        // Bind the log texture
+        logTexture.bind(gl);
+
+        // Front circle of the fifth cylinder
+        gl.glBegin(GL2.GL_TRIANGLE_FAN);
+        {
+            gl.glNormal3d(0, 0, 1);
+            gl.glTexCoord2d(0.5, 0.5); // Center texture coordinate
+            gl.glVertex3d(xShiftFifth, yShiftFifth, z1);
+            gl.glColor3f(0.1f, 0.1f, 0.1f); // Set shadow color
+            gl.glTexCoord2d(0.5, 0.5); // Center texture coordinate for the shadow vertex
+            gl.glVertex3d(xShiftThird, yShiftThird, z1);
+            double angleStep = 2 * Math.PI / slices;
+            for (int i = 0; i <= slices; i++) {
+                double a0 = i * angleStep;
+                double x0 = Math.cos(a0);
+                double y0 = Math.sin(a0);
+                double u = 0.5 * (x0 + 1); // Normalize x coordinate to range [0, 1]
+                double v = 0.5 * (y0 + 1); // Normalize y coordinate to range [0, 1]
+
+                gl.glTexCoord2d(u, v);
+                gl.glVertex3d(x0 + xShiftFifth, y0 + yShiftFifth, z1);
+            }
+        }
+        gl.glEnd();
+
+        // Back circle of the fifth cylinder
+        gl.glBegin(GL2.GL_TRIANGLE_FAN);
+        {
+            gl.glNormal3d(0, 0, -1);
+            gl.glVertex3d(xShiftFifth, yShiftFifth, z2);
+            double angleStep = 2 * Math.PI / slices;
+            for (int i = 0; i <= slices; i++) {
+                double a0 = 2 * Math.PI - i * angleStep;
+                double x0 = Math.cos(a0);
+                double y0 = Math.sin(a0);
+
+                gl.glVertex3d(x0 + xShiftFifth, y0 + yShiftFifth, z2);
+            }
+        }
+        gl.glEnd();
+
+        // Sides of the fifth cylinder
+        gl.glBegin(GL2.GL_QUADS);
+        {
+            double angleStep = 2 * Math.PI / slices;
+            for (int i = 0; i <= slices; i++) {
+                double a0 = i * angleStep;
+                double a1 = ((i + 1) % slices) * angleStep;
+
+                double x0 = Math.cos(a0);
+                double y0 = Math.sin(a0);
+
+                double x1 = Math.cos(a1);
+                double y1 = Math.sin(a1);
+
+                if (cylinder) {
+                    gl.glNormal3d(x0, y0, 0);
+                } else {
+                    gl.glNormal3d(-(z2 - z1) * (y1 - y0), (x1 - x0) * (z2 - z1), 0);
+                }
+
+                gl.glTexCoord2f(0, 0);
+                gl.glVertex3d(x0 + xShiftFifth, y0 + yShiftFifth, z1);
+
+                gl.glTexCoord2f(0, 1.0f);
+                gl.glVertex3d(x0 + xShiftFifth, y0 + yShiftFifth, z2);
+
+                if (cylinder) {
+                    gl.glNormal3d(x1, y1, 0);
+                }
+
+                gl.glTexCoord2f(0.5f, 1.0f);
+                gl.glVertex3d(x1 + xShiftFifth, y1 + yShiftFifth, z2);
+
+                gl.glTexCoord2f(0.5f, 0);
+                gl.glVertex3d(x1 + xShiftFifth, y1 + yShiftFifth, z1);
+            }
+        }
+        gl.glEnd();
+
+        // Sixth Cylinder
+        double xShiftSixth = -0.3; // Horizontal shift for the sixth cylinder
+        double yShiftSixth = 2.3;  // Vertical shift for the sixth cylinder
+
+        // Bind the log texture
+        logTexture.bind(gl);
+
+        // Front circle of the sixth cylinder
+        gl.glBegin(GL2.GL_TRIANGLE_FAN);
+        {
+            gl.glNormal3d(0, 0, 1);
+            gl.glTexCoord2d(0.5, 0.5); // Center texture coordinate
+            gl.glVertex3d(xShiftSixth, yShiftSixth, z1);
+            gl.glColor3f(0.1f, 0.1f, 0.1f); // Set shadow color
+            gl.glTexCoord2d(0.5, 0.5); // Center texture coordinate for the shadow vertex
+            gl.glVertex3d(xShiftFifth, yShiftFifth, z1);
+            double angleStep = 2 * Math.PI / slices;
+            for (int i = 0; i <= slices; i++) {
+                double a0 = i * angleStep;
+                double x0 = Math.cos(a0);
+                double y0 = Math.sin(a0);
+                double u = 0.5 * (x0 + 1); // Normalize x coordinate to range [0, 1]
+                double v = 0.5 * (y0 + 1); // Normalize y coordinate to range [0, 1]
+
+                gl.glTexCoord2d(u, v);
+                gl.glVertex3d(x0 + xShiftSixth, y0 + yShiftSixth, z1);
+            }
+        }
+        gl.glEnd();
+
+        // Back circle of the sixth cylinder
+        gl.glBegin(GL2.GL_TRIANGLE_FAN);
+        {
+            gl.glNormal3d(0, 0, -1);
+            gl.glVertex3d(xShiftSixth, yShiftSixth, z2);
+            double angleStep = 2 * Math.PI / slices;
+            for (int i = 0; i <= slices; i++) {
+                double a0 = 2 * Math.PI - i * angleStep;
+                double x0 = Math.cos(a0);
+                double y0 = Math.sin(a0);
+
+                gl.glVertex3d(x0 + xShiftSixth, y0 + yShiftSixth, z2);
+            }
+        }
+        gl.glEnd();
+
+        // Sides of the sixth cylinder
+        gl.glBegin(GL2.GL_QUADS);
+        {
+            double angleStep = 2 * Math.PI / slices;
+            for (int i = 0; i <= slices; i++) {
+                double a0 = i * angleStep;
+                double a1 = ((i + 1) % slices) * angleStep;
+
+                double x0 = Math.cos(a0);
+                double y0 = Math.sin(a0);
+
+                double x1 = Math.cos(a1);
+                double y1 = Math.sin(a1);
+
+                if (cylinder) {
+                    gl.glNormal3d(x0, y0, 0);
+                } else {
+                    gl.glNormal3d(0, 0, 1);
+                }
+
+                gl.glTexCoord2f(0, 0);
+                gl.glVertex3d(x0 + xShiftSixth, y0 + yShiftSixth, z1);
+
+                gl.glTexCoord2f(0, 1.0f);
+                gl.glVertex3d(x0 + xShiftSixth, y0 + yShiftSixth, z2);
+
+                if (cylinder) {
+                    gl.glNormal3d(x1, y1, 0);
+                }
+
+                gl.glTexCoord2f(0.5f, 1.0f);
+                gl.glVertex3d(x1 + xShiftSixth, y1 + yShiftSixth, z2);
+
+                gl.glTexCoord2f(0.5f, 0);
+                gl.glVertex3d(x1 + xShiftSixth, y1 + yShiftSixth, z1);
+            }
+        }
+        gl.glEnd();
+        
+        gl.glDisable(GL2.GL_TEXTURE_2D);
+    }*/
+
+ 
    private void drawBoat(GL2 gl) {
        
+       applyTexture = true;
+    if (applyTexture) {
+    // Enable texture mapping
+        gl.glEnable(GL.GL_TEXTURE_2D);
+        gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE, GL2.GL_REPLACE);
+        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
+        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
+
+    }
+
+        
     gl.glMatrixMode(GL2.GL_MODELVIEW);
     gl.glLoadIdentity();
     gl.glPushMatrix();
@@ -157,8 +760,8 @@ public class CGAssignment implements GLEventListener{
         //gl.glClear(GL.GL_COLOR_BUFFER_BIT);
        // gl.glLoadIdentity();
 
-        // Bind the wood texture
-        //woodBodyTexture.bind(gl);
+        //Bind the wood texture
+        woodBodyTexture.bind(gl);
 
         // Boat body 
         gl.glBegin(GL2.GL_POLYGON);
@@ -174,7 +777,7 @@ public class CGAssignment implements GLEventListener{
         gl.glEnd();
 
         // Bind the wood texture
-        //woodPoleTexture.bind(gl);
+        woodPoleTexture.bind(gl);
 
         // Pole 
         gl.glBegin(GL2.GL_POLYGON);
@@ -190,7 +793,7 @@ public class CGAssignment implements GLEventListener{
         gl.glEnd();
 
         // Bind the cloth texture
-        //clothSailsTexture.bind(gl);
+        clothSailsTexture.bind(gl);
 
         // Big sail
         gl.glBegin(GL2.GL_TRIANGLES);
@@ -221,8 +824,8 @@ public class CGAssignment implements GLEventListener{
         gl.glPopMatrix();
 
         gl.glFlush();
-            gl.glPopMatrix();
-          // gl.glDisable(GL2.GL_TEXTURE_2D);
+        gl.glPopMatrix();
+        gl.glDisable(GL2.GL_TEXTURE_2D);
    }
    
    private void drawTree(GL2 gl) {
@@ -465,15 +1068,15 @@ private void drawClouds(GL2 gl) {
    gl.glColor3f(0.0f, 0.0f, 1.0f); // Blue color
 
    //Enable texture mapping
-   gl.glEnable(GL2.GL_TEXTURE_2D);
+   //gl.glEnable(GL2.GL_TEXTURE_2D);
    // Bind the texture you want to use for the river
    // Make sure you have the texture file available and loaded
    // Example: gl.glBindTexture(GL2.GL_TEXTURE_2D, textureID);
 
    // Set the texture coordinates based on the texture offset
-   gl.glMatrixMode(GL2.GL_TEXTURE);
+   /*gl.glMatrixMode(GL2.GL_TEXTURE);
    gl.glLoadIdentity();
-   gl.glTranslatef(textureOffset, 0.0f, 0.0f);
+   gl.glTranslatef(textureOffset, 0.0f, 0.0f);*/
    
 
    // Draw the river as a rectangle
@@ -489,7 +1092,7 @@ private void drawClouds(GL2 gl) {
    gl.glEnd();
 
    // Disable texture mapping
-   gl.glDisable(GL2.GL_TEXTURE_2D);
+   //gl.glDisable(GL2.GL_TEXTURE_2D);
     }
     
        //Draw a line from 0,0 to size
