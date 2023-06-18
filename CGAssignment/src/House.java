@@ -1,4 +1,4 @@
-package cgassignment;
+package CGAssignment;
 
 import com.jogamp.opengl.GL2;
 import static com.jogamp.opengl.GL2ES3.GL_QUADS;
