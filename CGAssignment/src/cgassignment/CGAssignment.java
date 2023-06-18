@@ -31,6 +31,9 @@ public class CGAssignment implements GLEventListener{
     private Texture clothSailsTexture;
     private Texture woodPoleTexture;
     private Texture riverTexture;
+    private Texture trunkTexture;
+    private Texture leaveTexture;
+    private Texture rockTexture;
     /*private Texture logTexture;
     private boolean faceNormals = true;
     private static int angle = 0;
@@ -47,7 +50,7 @@ public class CGAssignment implements GLEventListener{
        GLJPanel panel = new GLJPanel(caps);
 
        // Put it in a window
-       final JFrame jframe = new JFrame("Assignment");
+       final JFrame jframe = new JFrame("Assignment by 2Delusional");
        jframe.setSize(900, 700);
        jframe.add(panel);
        jframe.setVisible(true);
@@ -75,15 +78,17 @@ public class CGAssignment implements GLEventListener{
    
 
    
-        drawGrass(gl);
+        drawSoil(gl);
         //drawLogs(drawable);
         drawRiver(gl); // Draw the river
         drawHills(gl);
         drawHouse(gl);
+        drawGrasses(gl);
         drawClouds(gl);
         drawTree(gl);
         drawBoat(gl);
         drawDuck(gl);
+        drawMultipleRock(gl);
         update(); // Update the models
         draw(gl); // Draw the models 
     }
@@ -95,6 +100,7 @@ public class CGAssignment implements GLEventListener{
         woodBodyTexture.destroy(gl);
         clothSailsTexture.destroy(gl);
         woodPoleTexture.destroy(gl);
+        riverTexture.destroy(gl);
        // logTexture.destroy(gl);
     }
    
@@ -113,6 +119,9 @@ public class CGAssignment implements GLEventListener{
             clothSailsTexture = TextureIO.newTexture(new File("C:\\Users\\Asus\\Desktop\\um stuffs\\CLASS\\WIG2002 - Computer Graphics\\CG_Assignment\\CGAssignment\\src\\texture\\cloth_sails.jpg"), true);
             woodPoleTexture = TextureIO.newTexture(new File("C:\\Users\\Asus\\Desktop\\um stuffs\\CLASS\\WIG2002 - Computer Graphics\\CG_Assignment\\CGAssignment\\src\\texture\\wood_pole.jpg"), true);
             riverTexture = TextureIO.newTexture(new File("C:\\Users\\Asus\\Desktop\\um stuffs\\CLASS\\WIG2002 - Computer Graphics\\CG_Assignment\\CGAssignment\\src\\texture\\river_texture.jpg"), true);
+            trunkTexture = TextureIO.newTexture(new File("C:\\Users\\Asus\\Desktop\\um stuffs\\CLASS\\WIG2002 - Computer Graphics\\CG_Assignment\\CGAssignment\\src\\texture\\treebark.jpg"), true);  //change both
+            leaveTexture = TextureIO.newTexture(new File("C:\\Users\\Asus\\Desktop\\um stuffs\\CLASS\\WIG2002 - Computer Graphics\\CG_Assignment\\CGAssignment\\src\\texture\\pinetree_leaves.jpg"), true);
+            rockTexture = TextureIO.newTexture(new File("C:\\Users\\Asus\\Desktop\\um stuffs\\CLASS\\WIG2002 - Computer Graphics\\CG_Assignment\\CGAssignment\\src\\texture\\rock.jpg"), true);
             //logTexture = TextureIO.newTexture(new File("C:\\Users\\Asus\\Desktop\\um stuffs\\CLASS\\WIG2002 - Computer Graphics\\CG_Assignment\\CGAssignment\\src\\texture\\log.jpg"), true);
 
             // Set texture parameters for cloth texture
@@ -155,234 +164,131 @@ public class CGAssignment implements GLEventListener{
     }
    
 /* ----------- all objects class -----------------*/
-   
-/*public void renderLogs(GLAutoDrawable drawable, int height, int slices, boolean cylinder) {
-    GL2 gl = drawable.getGL().getGL2();
-    gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-
-    double z1 = 0;
-    double z2 = -height;
-    gl.glPolygonMode(GL.GL_BACK, GL2.GL_FILL);
-
-    // Front circle of first cylinder
-    gl.glBegin(GL2.GL_TRIANGLE_FAN);
-    {
-        gl.glNormal3d(0, 0, 1);
-        gl.glVertex3d(0, 0, z1);
-
-        double angleStep = 2 * Math.PI / slices;
-        for (int i = 0; i <= slices; i++) {
-            double a0 = i * angleStep;
-            double x0 = Math.cos(a0);
-            double y0 = Math.sin(a0);
-
-            gl.glVertex3d(x0, y0, z1);
-        }
-    }
-    gl.glEnd();
-
-    // Back circle of first cylinder
-    gl.glBegin(GL2.GL_TRIANGLE_FAN);
-    {
-        gl.glNormal3d(0, 0, -1);
-        gl.glVertex3d(0, 0, z2);
-        double angleStep = 2 * Math.PI / slices;
-        for (int i = 0; i <= slices; i++) {
-            double a0 = 2 * Math.PI - i * angleStep;
-
-            double x0 = Math.cos(a0);
-            double y0 = Math.sin(a0);
-
-            gl.glVertex3d(x0, y0, z2);
-        }
-
-    }
-    gl.glEnd();
-
-    // Sides of the first cylinder
-    gl.glBegin(GL2.GL_QUADS);
-    {
-        double angleStep = 2 * Math.PI / slices;
-        for (int i = 0; i <= slices; i++) {
-            double a0 = i * angleStep;
-            double a1 = ((i + 1) % slices) * angleStep;
-
-            // Calculate vertices for the quad
-            double x0 = Math.cos(a0);
-            double y0 = Math.sin(a0);
-
-            double x1 = Math.cos(a1);
-            double y1 = Math.sin(a1);
-
-            // Set texture coordinates for the vertices
-
-            gl.glVertex3d(x0, y0, z1);
-            gl.glVertex3d(x0, y0, z2);
-            gl.glVertex3d(x1, y1, z2);
-            gl.glVertex3d(x1, y1, z1);
-        }
-    }
-    gl.glEnd();
-
-    // Draw the second cylinder on the side
-    double xShift = 1.5; // Horizontal shift for the second cylinder
-    double yShift = 0.3; // Vertical shift for the second cylinder
-
-    // Front circle of the second cylinder
-    gl.glBegin(GL2.GL_TRIANGLE_FAN);
-    {
-        gl.glNormal3d(0, 0, 1);
-        gl.glVertex3d(xShift, yShift, z1);
-        double angleStep = 2 * Math.PI / slices;
-        for (int i = 0; i <= slices; i++) {
-            double a0 = i * angleStep;
-            double x0 = Math.cos(a0);
-            double y0 = Math.sin(a0);
-
-            gl.glVertex3d(x0 + xShift, y0 + yShift, z1);
-        }
-    }
-    gl.glEnd();
-
-    // Back circle of the second cylinder
-    gl.glBegin(GL2.GL_TRIANGLE_FAN);
-    {
-        gl.glNormal3d(0, 0, -1);
-        gl.glVertex3d(xShift, yShift, z2);
-        double angleStep = 2 * Math.PI / slices;
-        for (int i = 0; i <= slices; i++) {
-            double a0 = 2 * Math.PI - i * angleStep;
-
-            double x0 = Math.cos(a0);
-            double y0 = Math.sin(a0);
-
-            gl.glVertex3d(x0 + xShift, y0 + yShift, z2);
-        }
-    }
-    gl.glEnd();
-
-    // Sides of the second cylinder
-    gl.glBegin(GL2.GL_QUADS);
-    {
-        double angleStep = 2 * Math.PI / slices;
-        for (int i = 0; i <= slices; i++) {
-            double a0 = i * angleStep;
-            double a1 = ((i + 1) % slices) * angleStep;
-
-            // Calculate vertices for the quad
-            double x0 = Math.cos(a0);
-            double y0 = Math.sin(a0);
-
-            double x1 = Math.cos(a1);
-            double y1 = Math.sin(a1);
-
-            gl.glVertex3d(x0 + xShift, y0 + yShift, z1);
-            gl.glVertex3d(x0 + xShift, y0 + yShift, z2);
-            gl.glVertex3d(x1 + xShift, y1 + yShift, z2);
-            gl.glVertex3d(x1 + xShift, y1 + yShift, z1);
-        }
-    }
-    gl.glEnd();
-
-    // Draw the third cylinder on the side
-    xShift = 0.3; // Horizontal shift for the third cylinder
-    yShift = -1.5; // Vertical shift for the third cylinder
-
-    // Front circle of the third cylinder
-    gl.glBegin(GL2.GL_TRIANGLE_FAN);
-    {
-        gl.glNormal3d(0, 0, 1);
-        gl.glVertex3d(xShift, yShift, z1);
-        double angleStep = 2 * Math.PI / slices;
-        for (int i = 0; i <= slices; i++) {
-            double a0 = i * angleStep;
-            double x0 = Math.cos(a0);
-            double y0 = Math.sin(a0);
-
-            gl.glVertex3d(x0 + xShift, y0 + yShift, z1);
-        }
-    }
-    gl.glEnd();
-
-    // Back circle of the third cylinder
-    gl.glBegin(GL2.GL_TRIANGLE_FAN);
-    {
-        gl.glNormal3d(0, 0, -1);
-        gl.glVertex3d(xShift, yShift, z2);
-        double angleStep = 2 * Math.PI / slices;
-        for (int i = 0; i <= slices; i++) {
-            double a0 = 2 * Math.PI - i * angleStep;
-
-            double x0 = Math.cos(a0);
-            double y0 = Math.sin(a0);
-
-            gl.glVertex3d(x0 + xShift, y0 + yShift, z2);
-        }
-    }
-    gl.glEnd();
-
-    // Sides of the third cylinder
-    gl.glBegin(GL2.GL_QUADS);
-    {
-        double angleStep = 2 * Math.PI / slices;
-        for (int i = 0; i <= slices; i++) {
-            double a0 = i * angleStep;
-            double a1 = ((i + 1) % slices) * angleStep;
-
-            // Calculate vertices for the quad
-            double x0 = Math.cos(a0);
-            double y0 = Math.sin(a0);
-
-            double x1 = Math.cos(a1);
-            double y1 = Math.sin(a1);
-
-            gl.glVertex3d(x0 + xShift, y0 + yShift, z1);
-            gl.glVertex3d(x0 + xShift, y0 + yShift, z2);
-            gl.glVertex3d(x1 + xShift, y1 + yShift, z2);
-            gl.glVertex3d(x1 + xShift, y1 + yShift, z1);
-        }
-    }
-    gl.glEnd();
-}
-
-   
-       public void drawLogs(GLAutoDrawable drawable) {
-        GL2 gl = drawable.getGL().getGL2();
-        gl.glMatrixMode(GL2.GL_MODELVIEW);
-        gl.glLoadIdentity();
-        gl.glTranslated(0, 0, -8);
-
-        // Set the camera position and orientation
-        double cameraDistance = 4.0;
-        double cameraHeight = 0.0;
-        double cameraAngle = 55.0; // Rotation angle around Y-axis
-
-        gl.glTranslatef(0, 0, (float) -cameraDistance);
-        gl.glRotatef((float) cameraAngle, 0, 1, 0);
-        gl.glTranslatef(0, (float) -cameraHeight, 0);
-
-        renderLogs(drawable, 4, slices, !faceNormals);
-        
-        //gl.glDisable(GL2.GL_TEXTURE_2D);
-
-    }*/
        
-   private void drawGrass(GL2 gl) {
+   private void drawSoil(GL2 gl) {
     gl.glBegin(GL_QUADS);
-    gl.glColor3f(0.0f, 0.5f, 0.5f);
+    gl.glColor3f(0.419608f, 0.556863f, 0.137255f);
     gl.glVertex3f(-5.0f, -1.0f, 0.0f);
     gl.glVertex3f(5.0f, -1.0f, 0.0f);
     gl.glVertex3f(5.0f, -3.0f, 0.0f);
     gl.glVertex3f(-5.0f, -3.0f, 0.0f);
-    gl.glEnd();       
+    gl.glEnd();  
+   }
+   
+   private void drawGrass(GL2 gl) {
+        gl.glPushMatrix();
+        // Set line width
+
+
+        // Draw the letter M
+        gl.glColor3f(0.184314f, 0.309804f, 0.184314f); // Green color  
+        gl.glBegin(GL2.GL_LINES);
+        gl.glVertex2f(-0.5f, -0.5f);
+        gl.glVertex2f(-0.5f, 0.5f);
+        gl.glVertex2f(-0.5f, 0.5f);
+        gl.glVertex2f(0.0f, 0.0f);
+        gl.glVertex2f(0.0f, 0.0f);
+        gl.glVertex2f(0.5f, 0.5f);
+        gl.glVertex2f(0.5f, 0.5f);
+        gl.glVertex2f(0.5f, -0.5f);
+        gl.glEnd();
+        
+        gl.glPopMatrix();
+   }
+   
+   private void drawGrasses(GL2 gl) {
+       
+    gl.glMatrixMode(GL2.GL_MODELVIEW);
+    gl.glLoadIdentity();
+    
+    // Set the number of hill duplicates and their positions
+    int numDuplicates = 6;
+    double[] translationX = { 1.0, 0.5, 0.0, 3.5, 3.3, -0.1};  // X-axis translations
+    double[] translationY = { -1.6, -2.0, -2.8, -1.8, -2.4, -1.6};   // Y-axis translations
+    double[] translationZ = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};   // Z-axis translations
+
+    double[] scaleX = { 0.1, 0.1, 0.1, 0.1, 0.1, 0.1};         // Scaling factors along the X-axis
+    double[] scaleY = { 0.1, 0.1, 0.1, 0.1, 0.1, 0.1};         // Scaling factors along the Y-axis
+    double[] scaleZ = { 0.1, 0.1, 0.1, 0.1, 0.1, 0.1};         // Scaling factors along the Z-axis
+    gl.glPushMatrix();
+    
+    // Loop through each duplicate
+    for (int i = 0; i < numDuplicates; i++) {
+        gl.glPushMatrix();
+        gl.glTranslated(translationX[i], translationY[i], translationZ[i]);
+        gl.glScaled(scaleX[i], scaleY[i], scaleZ[i]);
+        drawGrass(gl); // Call the method to draw the hill
+        gl.glPopMatrix();
+    }
+    
+
+   }
+   
+   private void drawRock(GL2 gl) {
+        
+        applyTexture = true;
+        if (applyTexture) {
+        // Enable texture mapping
+            gl.glEnable(GL.GL_TEXTURE_2D);
+            gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE, GL2.GL_REPLACE);
+            gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
+            gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
+
+        }
+        // Set the texture
+        rockTexture.bind(gl);
+        
+        // Draw a circle
+        int numSegments = 100; // Number of line segments to approximate the circle
+        float radiusX = 0.15f; // X radius of the circle
+        float radiusY = 0.10f; // Y radius of the circle (smaller value for a shorter circle)
+        float centerX = 0.0f; // X coordinate of the center of the circle
+        float centerY = 0.0f; // Y coordinate of the center of the circle
+        
+        gl.glBegin(GL.GL_TRIANGLE_FAN);
+        gl.glTexCoord2f(0.5f, 0.5f); // Center texture coordinate
+        gl.glVertex2f(centerX, centerY); // Center vertex
+        for (int i = 0; i <= numSegments; i++) {
+            float theta = (float) (2.0 * Math.PI * i / numSegments);
+            float x = centerX + radiusX * (float) Math.cos(theta);
+            float y = centerY + radiusY * (float) Math.sin(theta);
+            gl.glTexCoord2f((x + 1) / 2, (y + 1) / 2); // Texture coordinate based on vertex position
+            gl.glVertex2f(x, y);
+        }
+        gl.glEnd();
+        
+         // Disable texture mapping
+        gl.glDisable(GL.GL_TEXTURE_2D);
+
+        // Flush the OpenGL pipeline
+        gl.glFlush();
    }
 
+   private void drawMultipleRock(GL2 gl) {
+        gl.glMatrixMode(GL2.GL_MODELVIEW);
+        gl.glLoadIdentity();
+
+        // Set the number of hill duplicates and their positions
+        int numDuplicates = 4;
+        double[] translationX = { -1.0, -0.5, -3.0, -3.5};  // X-axis translations
+        double[] translationY = { -2.5, -2.5, -2.5, -2.5};   // Y-axis translations
+        double[] translationZ = { 0.0, 0.0, 0.0, 0.0};   // Z-axis translations
+
+        // Loop through each duplicate
+        for (int i = 0; i < numDuplicates; i++) {
+            gl.glPushMatrix();
+            gl.glTranslated(translationX[i], translationY[i], translationZ[i]);
+            drawRock(gl); // Call the method to draw the hill
+            gl.glPopMatrix();
+        }
+
+       }
    private void drawDuck(GL2 gl) {
 
         gl.glMatrixMode(GL2.GL_MODELVIEW);
         gl.glLoadIdentity();
         gl.glPushMatrix();
-        gl.glTranslated(textureOffset, -3.5, 0.0);
+        gl.glTranslated(pos, -3.5, 0.0);
         gl.glScaled(0.5, 0.5, 0.0);
         
         // Draw the body (oval)
@@ -447,6 +353,7 @@ public class CGAssignment implements GLEventListener{
         gl.glFlush();      
         gl.glPopMatrix();
    }
+   
    private void drawBoat(GL2 gl) {
        
        applyTexture = true;
@@ -463,8 +370,8 @@ public class CGAssignment implements GLEventListener{
     gl.glMatrixMode(GL2.GL_MODELVIEW);
     gl.glLoadIdentity();
     gl.glPushMatrix();
-    gl.glTranslated(2.0, -2.0, 0.0);
-    gl.glScaled(2.0, 2.0, 0.0);
+    gl.glTranslated(1.5, -2.0, 0.0);
+    gl.glScaled(3.0, 3.0, 0.0);
     
        //gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         //gl.glClear(GL.GL_COLOR_BUFFER_BIT);
@@ -546,6 +453,17 @@ public class CGAssignment implements GLEventListener{
         gl.glTranslated(3.0, -0.1, 0.0);
         gl.glScaled(3.0, 3.0, 0.0);
         
+        applyTexture = true;
+        if (applyTexture) {
+        // Enable texture mapping
+            gl.glEnable(GL.GL_TEXTURE_2D);
+            gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE, GL2.GL_REPLACE);
+            gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
+            gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
+        }
+        
+        trunkTexture.bind(gl);
+        
         // Draw the trunk
         gl.glColor3f(0.54f, 0.27f, 0.07f); // Brown color
         gl.glBegin(GL_QUADS);
@@ -560,7 +478,7 @@ public class CGAssignment implements GLEventListener{
         gl.glEnd();
 
         // Bind the leaves texture
-        //leavetexture.bind(gl);
+        leaveTexture.bind(gl);
 
         // Draw the branches
         gl.glColor3f(0.0f, 0.5f, 0.0f); // Green color
@@ -586,6 +504,8 @@ public class CGAssignment implements GLEventListener{
         gl.glEnd();
         
         gl.glPopMatrix();
+        
+        gl.glDisable(GL2.GL_TEXTURE_2D);
    }
 private void drawHouse(GL2 gl) {
     
@@ -695,6 +615,8 @@ private void drawClouds(GL2 gl) {
     gl.glMatrixMode(GL2.GL_MODELVIEW);
     gl.glLoadIdentity();
     
+    gl.glTranslatef((float) pos, 0.0f, 0.0f);
+    
     // Set the number of hill duplicates and their positions
     int numDuplicates = 3;
     double[] translationX = { 3.0, 0.0, -3.0 };  // X-axis translations
@@ -785,9 +707,9 @@ private void drawClouds(GL2 gl) {
    // Example: gl.glBindTexture(GL2.GL_TEXTURE_2D, textureID);
 
    // Set the texture coordinates based on the texture offset
-   gl.glMatrixMode(GL2.GL_TEXTURE);
-   gl.glLoadIdentity();
-   gl.glTranslatef(textureOffset, 0.0f, 0.0f);
+   //gl.glMatrixMode(GL2.GL_TEXTURE);
+   //gl.glLoadIdentity();
+   //gl.glTranslatef(textureOffset, 0.0f, 0.0f);
    
 
    // Draw the river as a rectangle
@@ -821,6 +743,7 @@ private void drawClouds(GL2 gl) {
       if(pos > 5) pos = -4;
       theta = theta + 0.5;
       
+      //changes the speed
       textureOffset += 0.01f;
         if (textureOffset > 1.0f) {
         textureOffset -= 1.0f;
