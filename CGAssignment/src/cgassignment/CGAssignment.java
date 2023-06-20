@@ -34,6 +34,8 @@ public class CGAssignment implements GLEventListener{
     private Texture trunkTexture;
     private Texture leaveTexture;
     private Texture rockTexture;
+    private Texture bladeTexture;
+    private Texture handleTexture;
     /*private Texture logTexture;
     private boolean faceNormals = true;
     private static int angle = 0;
@@ -82,13 +84,14 @@ public class CGAssignment implements GLEventListener{
         //drawLogs(drawable);
         drawRiver(gl); // Draw the river
         drawHills(gl);
-        drawHouse(gl);
         drawGrasses(gl);
         drawClouds(gl);
-        drawTree(gl);
+        drawMultipleTrees(gl);
+        drawHouse(gl);
         drawBoat(gl);
         drawDuck(gl);
         drawMultipleRock(gl);
+        drawAxe(gl);
         update(); // Update the models
         draw(gl); // Draw the models 
     }
@@ -122,6 +125,8 @@ public class CGAssignment implements GLEventListener{
             trunkTexture = TextureIO.newTexture(new File("C:\\Users\\Asus\\Desktop\\um stuffs\\CLASS\\WIG2002 - Computer Graphics\\CG_Assignment\\CGAssignment\\src\\texture\\treebark.jpg"), true);  //change both
             leaveTexture = TextureIO.newTexture(new File("C:\\Users\\Asus\\Desktop\\um stuffs\\CLASS\\WIG2002 - Computer Graphics\\CG_Assignment\\CGAssignment\\src\\texture\\pinetree_leaves.jpg"), true);
             rockTexture = TextureIO.newTexture(new File("C:\\Users\\Asus\\Desktop\\um stuffs\\CLASS\\WIG2002 - Computer Graphics\\CG_Assignment\\CGAssignment\\src\\texture\\rock.jpg"), true);
+            bladeTexture = TextureIO.newTexture(new File("C:\\Users\\Asus\\Desktop\\um stuffs\\CLASS\\WIG2002 - Computer Graphics\\CG_Assignment\\CGAssignment\\src\\texture\\blade.jpg"), true);
+            handleTexture = TextureIO.newTexture(new File("C:\\Users\\Asus\\Desktop\\um stuffs\\CLASS\\WIG2002 - Computer Graphics\\CG_Assignment\\CGAssignment\\src\\texture\\handle.png"), true);
             //logTexture = TextureIO.newTexture(new File("C:\\Users\\Asus\\Desktop\\um stuffs\\CLASS\\WIG2002 - Computer Graphics\\CG_Assignment\\CGAssignment\\src\\texture\\log.jpg"), true);
 
             // Set texture parameters for cloth texture
@@ -164,15 +169,58 @@ public class CGAssignment implements GLEventListener{
     }
    
 /* ----------- all objects class -----------------*/
+   
+   private void drawAxe(GL2 gl) {
+       
+        gl.glMatrixMode(GL2.GL_MODELVIEW);
+        gl.glLoadIdentity();
+        gl.glPushMatrix();
+        gl.glTranslated(3.5, -2.3, 0.0);
+        gl.glScaled(0.8, 0.8, 0.0);
+
+        // Enable texture mapping
+        gl.glEnable(GL.GL_TEXTURE_2D);
+
+        // Draw handle with texture
+        handleTexture.bind(gl);
+        gl.glBegin(GL2.GL_QUADS);
+        gl.glTexCoord2f(0.0f, 0.0f);
+        gl.glVertex2f(0.0f, -0.6f);
+        gl.glTexCoord2f(1.0f, 0.0f);
+        gl.glVertex2f(0.1f, -0.6f);
+        gl.glTexCoord2f(1.0f, 1.0f);
+        gl.glVertex2f(0.1f, 0.6f);
+        gl.glTexCoord2f(0.0f, 1.0f);
+        gl.glVertex2f(0.0f, 0.6f);
+        gl.glEnd();
+
+        // Draw blade with texture
+        bladeTexture.bind(gl);
+        gl.glBegin(GL2.GL_POLYGON);
+        gl.glTexCoord2f(0.0f, 0.0f);
+        gl.glVertex2f(0.1f, 0.6f);
+        gl.glTexCoord2f(1.0f, 0.0f);
+        gl.glVertex2f(0.4f, 0.7f);
+        gl.glTexCoord2f(1.0f, 1.0f);
+        gl.glVertex2f(0.4f, 0.1f);
+        gl.glTexCoord2f(0.0f, 1.0f);
+        gl.glVertex2f(0.1f, 0.2f);
+        gl.glEnd();
+        
+        gl.glPopMatrix();
+
+        // Disable texture mapping
+        gl.glDisable(GL.GL_TEXTURE_2D);       
+   }
        
    private void drawSoil(GL2 gl) {
-    gl.glBegin(GL_QUADS);
-    gl.glColor3f(0.419608f, 0.556863f, 0.137255f);
-    gl.glVertex3f(-5.0f, -1.0f, 0.0f);
-    gl.glVertex3f(5.0f, -1.0f, 0.0f);
-    gl.glVertex3f(5.0f, -3.0f, 0.0f);
-    gl.glVertex3f(-5.0f, -3.0f, 0.0f);
-    gl.glEnd();  
+        gl.glBegin(GL_QUADS);
+        gl.glColor3f(0.419608f, 0.556863f, 0.137255f);
+        gl.glVertex3f(-5.0f, -1.0f, 0.0f);
+        gl.glVertex3f(5.0f, -1.0f, 0.0f);
+        gl.glVertex3f(5.0f, -3.0f, 0.0f);
+        gl.glVertex3f(-5.0f, -3.0f, 0.0f);
+        gl.glEnd();  
    }
    
    private void drawGrass(GL2 gl) {
@@ -197,29 +245,29 @@ public class CGAssignment implements GLEventListener{
    }
    
    private void drawGrasses(GL2 gl) {
-       
-    gl.glMatrixMode(GL2.GL_MODELVIEW);
-    gl.glLoadIdentity();
-    
-    // Set the number of hill duplicates and their positions
-    int numDuplicates = 6;
-    double[] translationX = { 1.0, 0.5, 0.0, 3.5, 3.3, -0.1};  // X-axis translations
-    double[] translationY = { -1.6, -2.0, -2.8, -1.8, -2.4, -1.6};   // Y-axis translations
-    double[] translationZ = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};   // Z-axis translations
 
-    double[] scaleX = { 0.1, 0.1, 0.1, 0.1, 0.1, 0.1};         // Scaling factors along the X-axis
-    double[] scaleY = { 0.1, 0.1, 0.1, 0.1, 0.1, 0.1};         // Scaling factors along the Y-axis
-    double[] scaleZ = { 0.1, 0.1, 0.1, 0.1, 0.1, 0.1};         // Scaling factors along the Z-axis
-    gl.glPushMatrix();
-    
-    // Loop through each duplicate
-    for (int i = 0; i < numDuplicates; i++) {
+        gl.glMatrixMode(GL2.GL_MODELVIEW);
+        gl.glLoadIdentity();
+
+        // Set the number of hill duplicates and their positions
+        int numDuplicates = 6;
+        double[] translationX = { 1.0, 0.5, 0.0, 3.5, 3.3, -0.1};  // X-axis translations
+        double[] translationY = { -1.6, -2.0, -2.8, -1.8, -2.4, -1.6};   // Y-axis translations
+        double[] translationZ = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};   // Z-axis translations
+
+        double[] scaleX = { 0.1, 0.1, 0.1, 0.1, 0.1, 0.1};         // Scaling factors along the X-axis
+        double[] scaleY = { 0.1, 0.1, 0.1, 0.1, 0.1, 0.1};         // Scaling factors along the Y-axis
+        double[] scaleZ = { 0.1, 0.1, 0.1, 0.1, 0.1, 0.1};         // Scaling factors along the Z-axis
         gl.glPushMatrix();
-        gl.glTranslated(translationX[i], translationY[i], translationZ[i]);
-        gl.glScaled(scaleX[i], scaleY[i], scaleZ[i]);
-        drawGrass(gl); // Call the method to draw the hill
-        gl.glPopMatrix();
-    }
+
+        // Loop through each duplicate
+        for (int i = 0; i < numDuplicates; i++) {
+            gl.glPushMatrix();
+            gl.glTranslated(translationX[i], translationY[i], translationZ[i]);
+            gl.glScaled(scaleX[i], scaleY[i], scaleZ[i]);
+            drawGrass(gl); // Call the method to draw the hill
+            gl.glPopMatrix();
+        }
     
 
    }
@@ -268,7 +316,7 @@ public class CGAssignment implements GLEventListener{
         gl.glMatrixMode(GL2.GL_MODELVIEW);
         gl.glLoadIdentity();
 
-        // Set the number of hill duplicates and their positions
+        // Set the number of rock duplicates and their positions
         int numDuplicates = 4;
         double[] translationX = { -1.0, -0.5, -3.0, -3.5};  // X-axis translations
         double[] translationY = { -2.5, -2.5, -2.5, -2.5};   // Y-axis translations
@@ -278,7 +326,7 @@ public class CGAssignment implements GLEventListener{
         for (int i = 0; i < numDuplicates; i++) {
             gl.glPushMatrix();
             gl.glTranslated(translationX[i], translationY[i], translationZ[i]);
-            drawRock(gl); // Call the method to draw the hill
+            drawRock(gl); // Call the method to draw the rock
             gl.glPopMatrix();
         }
 
@@ -356,102 +404,121 @@ public class CGAssignment implements GLEventListener{
    
    private void drawBoat(GL2 gl) {
        
+         
        applyTexture = true;
-    if (applyTexture) {
-    // Enable texture mapping
-        gl.glEnable(GL.GL_TEXTURE_2D);
-        gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE, GL2.GL_REPLACE);
-        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
-        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
+         if (applyTexture) {
+         // Enable texture mapping
+             gl.glEnable(GL.GL_TEXTURE_2D);
+             gl.glTexEnvi(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE, GL2.GL_REPLACE);
+             gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
+             gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
 
-    }
+         }
 
-        
-    gl.glMatrixMode(GL2.GL_MODELVIEW);
-    gl.glLoadIdentity();
-    gl.glPushMatrix();
-    gl.glTranslated(1.5, -2.0, 0.0);
-    gl.glScaled(3.0, 3.0, 0.0);
-    
-       //gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-        //gl.glClear(GL.GL_COLOR_BUFFER_BIT);
-       // gl.glLoadIdentity();
 
-        //Bind the wood texture
-        woodBodyTexture.bind(gl);
+         gl.glMatrixMode(GL2.GL_MODELVIEW);
+         gl.glLoadIdentity();
+         gl.glPushMatrix();
+         gl.glTranslated(1.5, -2.0, 0.0);
+         gl.glScaled(3.0, 3.0, 0.0);
 
-        // Boat body 
-        gl.glBegin(GL2.GL_POLYGON);
-        gl.glColor3f(0.65f, 0.50f, 0.39f);
-        gl.glTexCoord2f(0.0f, 0.0f);
-        gl.glVertex2f(-0.4f, -0.2f);
-        gl.glTexCoord2f(0.0f, 1.0f);
-        gl.glVertex2f(-0.2f, -0.4f);
-        gl.glTexCoord2f(1.0f, 1.0f);
-        gl.glVertex2f(0.2f, -0.4f);
-        gl.glTexCoord2f(1.0f, 0.0f);
-        gl.glVertex2f(0.4f, -0.2f);
-        gl.glEnd();
+            //gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+             //gl.glClear(GL.GL_COLOR_BUFFER_BIT);
+            // gl.glLoadIdentity();
 
-        // Bind the wood texture
-        woodPoleTexture.bind(gl);
+             //Bind the wood texture
+             woodBodyTexture.bind(gl);
 
-        // Pole 
-        gl.glBegin(GL2.GL_POLYGON);
-        gl.glColor3f(0.65f, 0.50f, 0.39f);
-        gl.glTexCoord2f(0.0f, 0.0f);
-        gl.glVertex2f(-0.02f, -0.2f);
-        gl.glTexCoord2f(0.0f, 1.0f);
-        gl.glVertex2f(-0.02f, 0.3f);
-        gl.glTexCoord2f(1.0f, 1.0f);
-        gl.glVertex2f(0.02f, 0.3f);
-        gl.glTexCoord2f(1.0f, 0.0f);
-        gl.glVertex2f(0.02f, -0.2f);
-        gl.glEnd();
+             // Boat body 
+             gl.glBegin(GL2.GL_POLYGON);
+             gl.glColor3f(0.65f, 0.50f, 0.39f);
+             gl.glTexCoord2f(0.0f, 0.0f);
+             gl.glVertex2f(-0.4f, -0.2f);
+             gl.glTexCoord2f(0.0f, 1.0f);
+             gl.glVertex2f(-0.2f, -0.4f);
+             gl.glTexCoord2f(1.0f, 1.0f);
+             gl.glVertex2f(0.2f, -0.4f);
+             gl.glTexCoord2f(1.0f, 0.0f);
+             gl.glVertex2f(0.4f, -0.2f);
+             gl.glEnd();
 
-        // Bind the cloth texture
-        clothSailsTexture.bind(gl);
+             // Bind the wood texture
+             woodPoleTexture.bind(gl);
 
-        // Big sail
-        gl.glBegin(GL2.GL_TRIANGLES);
-        gl.glColor3f(0.96f, 0.80f, 0.69f);
-        gl.glTexCoord2f(0.0f, 0.0f);
-        gl.glVertex2f(0.02f, -0.12f);
-        gl.glTexCoord2f(0.0f, 1.0f);
-        gl.glVertex2f(0.02f, 0.3f);
-        gl.glTexCoord2f(1.0f, 0.0f);
-        gl.glVertex2f(0.35f, -0.12f);
-        gl.glEnd();
+             // Pole 
+             gl.glBegin(GL2.GL_POLYGON);
+             gl.glColor3f(0.65f, 0.50f, 0.39f);
+             gl.glTexCoord2f(0.0f, 0.0f);
+             gl.glVertex2f(-0.02f, -0.2f);
+             gl.glTexCoord2f(0.0f, 1.0f);
+             gl.glVertex2f(-0.02f, 0.3f);
+             gl.glTexCoord2f(1.0f, 1.0f);
+             gl.glVertex2f(0.02f, 0.3f);
+             gl.glTexCoord2f(1.0f, 0.0f);
+             gl.glVertex2f(0.02f, -0.2f);
+             gl.glEnd();
 
-        gl.glPushMatrix();
-        gl.glScalef(-1.0f, 0.8f, 1.0f);
-        gl.glTranslatef(0.0f, -0.03f, 0.0f);
+             // Bind the cloth texture
+             clothSailsTexture.bind(gl);
 
-        // Small sail 
-        gl.glBegin(GL2.GL_TRIANGLES);
-        
-        gl.glTexCoord2f(0.0f, 0.0f);
-        gl.glVertex2f(0.02f, -0.12f);
-        gl.glTexCoord2f(0.0f, 1.0f);
-        gl.glVertex2f(0.02f, 0.3f);
-        gl.glTexCoord2f(1.0f, 0.0f);
-        gl.glVertex2f(0.35f, -0.12f);
-        gl.glEnd();
+             // Big sail
+             gl.glBegin(GL2.GL_TRIANGLES);
+             gl.glColor3f(0.96f, 0.80f, 0.69f);
+             gl.glTexCoord2f(0.0f, 0.0f);
+             gl.glVertex2f(0.02f, -0.12f);
+             gl.glTexCoord2f(0.0f, 1.0f);
+             gl.glVertex2f(0.02f, 0.3f);
+             gl.glTexCoord2f(1.0f, 0.0f);
+             gl.glVertex2f(0.35f, -0.12f);
+             gl.glEnd();
 
-        gl.glPopMatrix();
+             gl.glPushMatrix();
+             gl.glScalef(-1.0f, 0.8f, 1.0f);
+             gl.glTranslatef(0.0f, -0.03f, 0.0f);
 
-        gl.glFlush();
-        gl.glPopMatrix();
-        gl.glDisable(GL2.GL_TEXTURE_2D);
-   }
-   
-   private void drawTree(GL2 gl) {
-       
+             // Small sail 
+             gl.glBegin(GL2.GL_TRIANGLES);
+
+             gl.glTexCoord2f(0.0f, 0.0f);
+             gl.glVertex2f(0.02f, -0.12f);
+             gl.glTexCoord2f(0.0f, 1.0f);
+             gl.glVertex2f(0.02f, 0.3f);
+             gl.glTexCoord2f(1.0f, 0.0f);
+             gl.glVertex2f(0.35f, -0.12f);
+             gl.glEnd();
+
+             gl.glPopMatrix();
+
+             gl.glFlush();
+             gl.glPopMatrix();
+             gl.glDisable(GL2.GL_TEXTURE_2D);
+        }
+
+    private void drawMultipleTrees(GL2 gl) {
         gl.glMatrixMode(GL2.GL_MODELVIEW);
         gl.glLoadIdentity();
+
+        // Set the number of tree duplicates and their positions
+        int numDuplicates = 4;
+        double[] translationX = { 3.0, -0.5, 0.7, 1.7};  // X-axis translations
+        double[] translationY = { 0.1, 0.5, -1.2, -0.8};   // Y-axis translations
+        double[] translationZ = { 0.0, 0.0, 0.0, 0.0};   // Z-axis translations
+        
+        double[] scaleX = { 3.0, 2.0, 1.0, 0.5 };         // Scaling factors along the X-axis
+        double[] scaleY = { 3.0, 2.0, 1.0, 0.5 };         // Scaling factors along the Y-axis
+        double[] scaleZ = { 0.0, 0.0, 0.0, 0.0 };         // Scaling factors along the Z-axis
         gl.glPushMatrix();
-        gl.glTranslated(3.0, -0.1, 0.0);
-        gl.glScaled(3.0, 3.0, 0.0);
+        // Loop through each duplicate
+        for (int i = 0; i < numDuplicates; i++) {
+            gl.glPushMatrix();
+            gl.glTranslated(translationX[i], translationY[i], translationZ[i]);
+            gl.glScaled(scaleX[i], scaleY[i], scaleZ[i]);
+            drawTree(gl); // Call the method to draw the tree
+            gl.glPopMatrix();
+        }
+
+       }
+   private void drawTree(GL2 gl) {
         
         applyTexture = true;
         if (applyTexture) {
@@ -465,7 +532,6 @@ public class CGAssignment implements GLEventListener{
         trunkTexture.bind(gl);
         
         // Draw the trunk
-        gl.glColor3f(0.54f, 0.27f, 0.07f); // Brown color
         gl.glBegin(GL_QUADS);
         gl.glTexCoord2f(0.0f, 0.0f);
         gl.glVertex2f(-0.05f, -0.5f);
@@ -617,7 +683,7 @@ private void drawClouds(GL2 gl) {
     
     gl.glTranslatef((float) pos, 0.0f, 0.0f);
     
-    // Set the number of hill duplicates and their positions
+    // Set the number of cloud duplicates and their positions
     int numDuplicates = 3;
     double[] translationX = { 3.0, 0.0, -3.0 };  // X-axis translations
     double[] translationY = { 1.0, 3.0, 2.0 };   // Y-axis translations
@@ -633,7 +699,7 @@ private void drawClouds(GL2 gl) {
         gl.glPushMatrix();
         gl.glTranslated(translationX[i], translationY[i], translationZ[i]);
         gl.glScaled(scaleX[i], scaleY[i], scaleZ[i]);
-        drawCloud(gl); // Call the method to draw the hill
+        drawCloud(gl); // Call the method to draw the clouds
         gl.glPopMatrix();
     }
     
